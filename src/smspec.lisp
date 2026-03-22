@@ -89,12 +89,11 @@
 		    T)
 								       ;IS EMBEDDED.
 		   ((EQUAL TENSE '(MODAL))
-		    (SETQ GLOBAL-MESSAGE '(THAT DOESN\'T
-						MAKE
-						ANY
-						SENSE
-						TO
-						ME\.))
+		    ;; Don't set error message here - let the semantic
+		    ;; check run first. If restrictions fail for a modal
+		    ;; polar question like "can the table pick up blocks?"
+		    ;; the answer should be "NO", not "doesn't make sense."
+		    ;; The original 1972 SHRDLU answered "NO" correctly.
 		    (ADD-F-PT 'MODAL PT))
 								       ;CLAUSES ARE ALSO MARKED AS
 		   ((AND (EQUAL TENSE '(FUTURE))
@@ -911,6 +910,17 @@
 		       ;SMOB1, ETC.  THE VALUE OF THE EVALUATION IS A
 		       ;LIST OF RELAT ION-SEMANTIC-STRUCTURES, ONE FOR
 		       ;EACH PLAUSIBLE INTERPRETATION
+
+	     ;; For modal polar questions (like "can the table pick up
+	     ;; blocks?"), if the restriction check fails, the answer
+	     ;; should be "NO" rather than "doesn't make sense."
+	     ;; The original 1972 SHRDLU answered "NO" to this.
+	     ;; We produce a minimal SM so the answer path can run.
+	     (AND (NULL SM)
+		  (CQ MODAL)
+		  (CQ POLAR)
+		  SENSE-OF-VERB
+		  (SETQ SM '(RESTRICTFAIL)))
 
 	     ;;; ;
 	     (MAPL #'SMCL-MODIFIERS H)

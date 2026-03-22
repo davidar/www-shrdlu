@@ -204,7 +204,9 @@ TEST-LOOP
 	     (PRINT3 '?)
 	     (show-response)
 	     (TERPRI)
-	READ (SETQ XX (parse-integer (read-remote) :junk-allowed t))
+	READ (LET ((INPUT (read-remote)))
+	       (SETQ XX (IF (NUMBERP INPUT) INPUT
+			    (parse-integer INPUT :junk-allowed t))))
 	     (COND ((OR (NOT (NUMBERP XX))
 			(> XX (LENGTH POSSIBILITIES)))
 		    (TERPRI)
@@ -1287,11 +1289,15 @@ TEST-LOOP
 
 ;;;############################################################
 
-(DEFUN TOPLEVEL (EVENT) 
+(DEFUN TOPLEVEL (EVENT &OPTIONAL (DEPTH 0))
 
        ;;FINDS THE TOP LEVEL EVENT GOING ON AT THE TIME
-       (COND ((EQ (GET EVENT 'WHY) 'COMMAND) EVENT)
-	     (T (TOPLEVEL (GET EVENT 'WHY)))))
+       ;; Added depth guard to prevent infinite recursion on
+       ;; broken WHY chains (bug in original SHRDLU too)
+       (COND ((> DEPTH 100) EVENT)
+             ((NULL (GET EVENT 'WHY)) EVENT)
+             ((EQ (GET EVENT 'WHY) 'COMMAND) EVENT)
+	     (T (TOPLEVEL (GET EVENT 'WHY) (1+ DEPTH)))))
 
 
 

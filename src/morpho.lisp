@@ -46,6 +46,7 @@
 	  ;; WORD is accumulating letters in a word, and SENT accumulates 
 	  ;; words in a sentence.  Both have to be reversed to make sense.
 	THRU (SETQ SENT (SETQ WORD (SETQ PUNCT (SETQ POSS NIL))))
+	     (if remote-cmds-p (purge-cmd-buffer))
 	     (show-response)
 	     (PRINT 'READY1)
 	     (TERPRI)

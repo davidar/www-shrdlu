@@ -358,6 +358,12 @@
 						    'BIND))
 				      (REMPROP PRONOUN 'BIND))
 		   '(IT THEY ONE))
+	     ;; Clean up stale planner variable bindings and referent
+	     ;; properties from this sentence to prevent them leaking
+	     ;; into the next one. UNKNOWN-OSS-BY is used for passive
+	     ;; "by" agents (e.g., "supported BY what").
+	     (REMPROP 'UNKNOWN 'BIND)
+	     (REMPROP 'UNKNOWN-OSS-BY 'REFER=)
 	     (OR
 	      (CQ MODAL)
 	      (CQ DECLAR)
@@ -378,14 +384,11 @@
 		  ((REFER? (CAR (SM BACKNODE))))
 								       ;IF NODE HAS REFERENT, FINE
 		  (ELSE
-		   (SETF (GET (CAR (SM BACKNODE)) 'REFER=)
-			    (OR (GET (VARIABLE? (CAR (SM BACKNODE)))
-				     'BIND)
-				(ERT DOBACKREF\:
-				     RETURN
-				     REFERENT
-				     FOR
-				     BACKNODE))))))
+		   (LET ((BOUND (GET (VARIABLE? (CAR (SM BACKNODE)))
+				     'BIND)))
+		     (WHEN BOUND
+		       (SETF (GET (CAR (SM BACKNODE)) 'REFER=)
+			     BOUND))))))
 	       BACKREF2))
 
 	     ;;; A FEW MISSING PIECES
