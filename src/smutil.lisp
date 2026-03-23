@@ -207,10 +207,15 @@
 		;; RESTRICTIONS: IS EXPANDED HERE PUTING IN IMPLICIT
 		;;REGISTER REFERENCES SO THAT IT CAN BE UNIFORMLY
 		;;GOBBLED BELOW
+		;; Guard against RESTRICTIONS: being an atom (e.g., the
+		;; DO verb has RESTRICTIONS: RESTRICTIONS: as a self-reference,
+		;; meaning "use the restrictions from context"). MacLisp's
+		;; MAPCAR on an atom returned nil; CL's crashes.
+		(AND (LISTP RESTRICTIONS\:)
 		(SETQ RESTRICTIONS\:
-		      (MAPCAR #'(LAMBDA (%RESTRICTNAM %MARKL %NUM) 
+		      (MAPCAR #'(LAMBDA (%RESTRICTNAM %MARKL %NUM)
 								       ;MARKL IS A SINGLE MARKER LIST FROM ON OF THE
-				       ((LAMBDA (X) 
+				       ((LAMBDA (X)
 						(SET %NUM
 						     (EVAL (CAR X)))
 						X)
@@ -219,11 +224,11 @@
 					       %MARKL)
 								       ;#RED).    %RESTRICTNAM IS A NAME LIKE SMSUB,
 					      ((CONS %RESTRICTNAM
-								       ;SMOBL, SMCOMP, .... WHICH REFERS TO REGISTERS  
+								       ;SMOBL, SMCOMP, .... WHICH REFERS TO REGISTERS
 						     %MARKL)))))
 			      '(SMSUB SMOB1 SMOB2)
 			      RESTRICTIONS\:
-			      '(\#1 \#2 \#3)))
+			      '(\#1 \#2 \#3))))
 								       ;ELSEWHERE IN THE PROGRAM WHOSE MARKERS MUST BE
 		(AND ;COMPATIBLE WITH %MARKL AS CHECKED BELOW.%NUM IS
 		       ;THE NUMBER WHICH WILL BE USED TO SUBSTITUTE IN
@@ -231,11 +236,12 @@
 		 ;; CHECK THAT THIS DEFINITION SENSE MEETS ALL OF THE
 		 ;;RESTRICTIONS SET FORTH IN THE DEFINITION UNDER
 		 ;;RESTRICTIONS:.
+		(AND (LISTP RESTRICTIONS\:)
 		(CATCH 'STOP
-		  (MAPC 
-		   #'(LAMBDA (%MARKL) 
+		  (MAPC
+		   #'(LAMBDA (%MARKL)
 								       ;ENCLOSED IN A ERRSET SO THAT THE FAILURE OF A
-		     (PROG (OSS X CHECK) 
+		     (PROG (OSS X CHECK)
 			   (SETQ OSS (EVAL (CAR %MARKL)))
 			   (AND (SETQ X (CHECKREL OSS))
 				(SETQ REL\: (CAR X)))
@@ -256,7 +262,7 @@
 								       ;ONE HAND OR THE CONFLICT OF NAMES BETWEEN THE
 			     (SETQ RELMARKERS\: CHECK)))))
 								       ;THE MARKERS RESULTING FROM CHECKING THE REL ARE
-		   RESTRICTIONS\:))
+		   RESTRICTIONS\:)))
 								       ;SAVED TO PUT ON IT LATER WHEN THE CLAUSE IS
 		       ;RELATED. SUBJECT RESTRICTION MARKERS USED IN
 		       ;THE DEFINITION AND THE REGISTERS OF THE SAME
@@ -392,6 +398,9 @@
 	       BACKREF2))
 
 	     ;;; A FEW MISSING PIECES
+	     ;; LASTEVENT should be set here but was never implemented.
+	     ;; Initialize to nil to prevent unbound variable crashes.
+	     (OR (BOUNDP 'LASTEVENT) (SETQ LASTEVENT NIL))
 	     ;;; GO HERE
 	     )
        ) 
