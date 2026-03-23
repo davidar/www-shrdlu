@@ -398,9 +398,11 @@
 	       BACKREF2))
 
 	     ;;; A FEW MISSING PIECES
-	     ;; LASTEVENT should be set here but was never implemented.
-	     ;; Initialize to nil to prevent unbound variable crashes.
+	     ;; LASTEVENT and LASTANSEVENT should be set here but were
+	     ;; never fully implemented in the original. Initialize to
+	     ;; prevent unbound variable crashes.
 	     (OR (BOUNDP 'LASTEVENT) (SETQ LASTEVENT NIL))
+	     (OR (BOUNDP 'LASTANSEVENT) (SETQ LASTANSEVENT NIL))
 	     ;;; GO HERE
 	     )
        ) 

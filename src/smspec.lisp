@@ -130,7 +130,13 @@
 	     (SETF (GET TSS 'TENSE=) TENSE)
 	     (RETURN T))) 
 
-(DEFUN SMADJGQSHORT NIL (ERT SMADJQSHORT NOT WRITTEN YET)) 
+(DEFUN SMADJGQSHORT NIL (ERT SMADJQSHORT NOT WRITTEN YET))
+
+;; SMTHAT - semantic handler for "THAT" as a demonstrative pronoun.
+;; Referenced in dictionary but never implemented in the original SHRDLU.
+;; Was intended to handle "do THAT" / "why did you do THAT?" by resolving
+;; "that" to an event reference. Left as a stub to match the original.
+
 
 (DEFUN SMPRON (NODE) 
        (EVAL (SM NODE))
@@ -921,6 +927,7 @@
 		  (CQ POLAR)
 		  SENSE-OF-VERB
 		  (SETQ SM '(RESTRICTFAIL)))
+
 
 	     ;;; ;
 	     (MAPL #'SMCL-MODIFIERS H)
